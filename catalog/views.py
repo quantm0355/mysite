@@ -1,5 +1,7 @@
 from django.shortcuts import render
 from catalog.models import Book, Author, BookInstance, Genre
+from django.views import generic
+from django.shortcuts import get_object_or_404
 
 
 # Create your views here.
@@ -22,3 +24,19 @@ def index(request):
         'num_visits': num_visits
     }  # Render the HTML template index.html with the data in the context variablereturn render(request, 'index.html', context=context)
     return render(request, 'index.html', context=context)
+
+
+class BookListView(generic.ListView):
+    model = Book
+    context_object_name = 'book_list'  # your own name for the list as a template
+    variablequeryset = Book.objects.filter(title__icontains='Anh')[
+        :5]  # Get 5 books containing the title war
+
+
+class BookDetailView(generic.DetailView):
+    model = Book
+    paginate_by = 10
+
+    def book_detail_view(request, primary_key):
+        book = get_object_or_404(Book, pk=primary_key)
+        return render(request, 'catalog/book_detail.html', context={'book': book})
